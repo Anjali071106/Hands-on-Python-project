@@ -1,0 +1,13 @@
+atm_pin = 1234
+balance = 5000
+
+if int(input("Enter ATM PIN: ")) == atm_pin:
+    print("Balance:", balance)
+    amt = float(input("Enter amount to withdraw: "))
+    if amt <= balance:
+        balance -= amt
+        print("Withdrawal successful. Remaining balance:", balance)
+    else:
+        print("Insufficient balance.")
+else:
+    print("Incorrect PIN.")
