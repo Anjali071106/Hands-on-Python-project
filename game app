@@ -1,0 +1,33 @@
+board = [" " for _ in range(9)]
+
+def print_board():
+    print(board[0] + "|" + board[1] + "|" + board[2])
+    print("-+-+-")
+    print(board[3] + "|" + board[4] + "|" + board[5])
+    print("-+-+-")
+    print(board[6] + "|" + board[7] + "|" + board[8])
+
+current_player = "X"
+
+for _ in range(9):
+    print_board()
+    move = int(input(f"Player {current_player}, enter position (1-9): ")) - 1
+    if board[move] == " ":
+        board[move] = current_player
+        if (board[0] == board[1] == board[2] != " " or
+            board[3] == board[4] == board[5] != " " or
+            board[6] == board[7] == board[8] != " " or
+            board[0] == board[3] == board[6] != " " or
+            board[1] == board[4] == board[7] != " " or
+            board[2] == board[5] == board[8] != " " or
+            board[0] == board[4] == board[8] != " " or
+            board[2] == board[4] == board[6] != " "):
+            print_board()
+            print(f"Player {current_player} wins!")
+            break
+        current_player = "O" if current_player == "X" else "X"
+    else:
+        print("Invalid move.")
+else:
+    print_board()
+    print("It's a draw!")
