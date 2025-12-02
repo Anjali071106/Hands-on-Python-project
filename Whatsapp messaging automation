@@ -1,0 +1,53 @@
+from twilio.rest import Client
+import csv
+from pathlib import Path
+
+# Twilio Credentials
+ACCOUNT_SID = "your_account_sid"
+AUTH_TOKEN = "your_auth_token"
+
+# WhatsApp sender number (from Twilio Sandbox)
+FROM_WHATSAPP = "whatsapp:+14155238886"
+
+# CSV file containing phone numbers
+RECIPIENTS_FILE = "whatsapp_numbers.csv"
+
+# Message you want to send
+MESSAGE = "This is an automated WhatsApp message."
+
+client = Client(ACCOUNT_SID, AUTH_TOKEN)
+
+
+def load_numbers(path: str):
+    nums = []
+    file_path = Path(path)
+    if not file_path.exists():
+        return nums
+
+    with open(file_path, newline="", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if not row:
+                continue
+            n = row[0].strip()
+            if n:
+                nums.append(n)
+    return nums
+
+
+def send_whatsapp(num: str, msg: str):
+    client.messages.create(
+        body=msg,
+        from_=FROM_WHATSAPP,
+        to=f"whatsapp:{num}"
+    )
+
+
+def send_bulk_whatsapp():
+    numbers = load_numbers(RECIPIENTS_FILE)
+    for n in numbers:
+        send_whatsapp(n, MESSAGE)
+
+
+if __name__ == "__main__":
+    send_bulk_whatsapp()
