@@ -1,0 +1,72 @@
+import smtplib
+import ssl
+from email.message import EmailMessage
+import csv
+from pathlib import Path
+
+# SMTP Configuration (Gmail example)
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 465
+SENDER_EMAIL = "your_email@gmail.com"
+SENDER_PASSWORD = "your_app_password"
+
+SUBJECT = "Automated Email"
+BODY = """Hello,
+
+This is an automated email.
+
+Regards,
+Automation Script
+"""
+
+RECIPIENTS_FILE = "recipients.csv"
+
+
+def load_recipients(path: str):
+    recipients = []
+    file_path = Path(path)
+
+    if not file_path.exists():
+        return recipients
+
+    with open(file_path, newline="", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if not row:
+                continue
+            email = row[0].strip()
+            if email:
+                recipients.append(email)
+    return recipients
+
+
+def build_message(sender: str, recipient: str, subject: str, body: str) -> EmailMessage:
+    msg = EmailMessage()
+    msg["From"] = sender
+    msg["To"] = recipient
+    msg["Subject"] = subject
+    msg.set_content(body)
+    return msg
+
+
+def send_email(sender: str, password: str, recipient: str, subject: str, body: str):
+    msg = build_message(sender, recipient, subject, body)
+    context = ssl.create_default_context()
+
+    with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
+        server.login(sender, password)
+        server.send_message(msg)
+
+
+def send_bulk_emails():
+    recipients = load_recipients(RECIPIENTS_FILE)
+
+    if not recipients:
+        return
+
+    for r in recipients:
+        send_email(SENDER_EMAIL, SENDER_PASSWORD, r, SUBJECT, BODY)
+
+
+if __name__ == "__main__":
+    send_bulk_emails()
